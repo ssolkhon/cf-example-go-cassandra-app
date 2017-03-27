@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cf-example-go-cassandra-app/models"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,13 +13,14 @@ const (
 )
 
 func HelloServer(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintln(w, "Hello, World!\n")
+	myRecord := models.GetRecord("hello")
+	fmt.Fprintln(w, myRecord.Value)
 }
 
 func main() {
 	var port string
 	if port = os.Getenv("PORT"); len(port) == 0 {
-		log.Printf("Warning, PORT not set. Defaulting to %+vn", DEFAULT_PORT)
+		log.Printf("Warning, PORT not set. Defaulting to %+v\n", DEFAULT_PORT)
 		port = DEFAULT_PORT
 	}
 
@@ -27,5 +29,4 @@ func main() {
 	if err != nil {
 		log.Printf("ListenAndServe: ", err)
 	}
-
 }
