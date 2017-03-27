@@ -1,0 +1,8 @@
+---
+applications:
+- name: go-cassandra
+  memory: 64M
+  instances: 2
+  buildpack: https://github.com/cloudfoundry/go-buildpack.git
+  env:
+    GOPACKAGENAME: cf-example-go-cassandra-app
