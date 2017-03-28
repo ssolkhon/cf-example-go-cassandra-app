@@ -1,0 +1,22 @@
+{  
+   "cassandra":[  
+      {  
+         "name":"local-example-cass",
+         "label":"cassandra",
+         "tags":[  
+            "cassandra",
+            "noosql",
+            "dse"
+         ],
+         "plan":"default",
+         "credentials":{  
+            "username":"cassandra",
+            "password":"cassandra",
+            "keyspace":"local_example_cass",
+            "port":9042,
+            "hosts":"127.0.0.1",
+            "firewall_allow_rules":"127.0.0.1"
+         }
+      }
+   ]
+}

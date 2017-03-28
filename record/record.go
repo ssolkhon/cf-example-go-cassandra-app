@@ -1,4 +1,4 @@
-package models
+package record
 
 type Record struct {
 	Key   string
