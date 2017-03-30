@@ -2,13 +2,15 @@ package main
 
 import (
 	"cf-example-go-cassandra-app/cf"
-	"cf-example-go-cassandra-app/record"
+	"cf-example-go-cassandra-app/db/cassandra"
 	"encoding/json"
 	"fmt"
+	"github.com/gocql/gocql"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 const (
@@ -16,12 +18,41 @@ const (
 	DEFAULT_CONFIG = "./example_config.json"
 )
 
-func DefaultHandler(s *cf.Services) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		myRecord := record.GetRecord("hello")
+func handleFavicon(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "favicon.ico")
+}
 
-		fmt.Fprintf(w, "Record: %+v\n", myRecord.Value)
-		fmt.Fprintf(w, "Name: %+v\n", s.Cassandra[0].Name)
+func handleRequest(session *gocql.Session) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		myPath := strings.Split(r.URL.Path, "/")
+
+		switch {
+		case len(myPath) == 2:
+			if myPath[1] != "" {
+				err := cassandra.CreateTable(session, myPath[1])
+				if err != nil {
+					msg := "Error: " + err.Error()
+					fmt.Fprintf(w, msg)
+					log.Println(msg)
+				} else {
+					msg := "Successfully created collection " + myPath[1]
+					fmt.Fprintf(w, msg)
+					log.Printf(msg)
+				}
+			} else {
+				msg := "Error: No parameters provided"
+				fmt.Fprintf(w, msg)
+			}
+		case len(myPath) == 3:
+			msg := "Coming soon..."
+			fmt.Fprintf(w, msg)
+		case len(myPath) == 4:
+			msg := "Coming soon..."
+			fmt.Fprintf(w, msg)
+		default:
+			msg := "Error: Too many parameters provided"
+			fmt.Fprintf(w, msg)
+		}
 	}
 }
 
@@ -40,7 +71,7 @@ func main() {
 		log.Printf("Warning, VCAP_SERVICES not set. Defaulting to %+v\n", DEFAULT_CONFIG)
 		file, err := ioutil.ReadFile(DEFAULT_CONFIG)
 		if err != nil {
-			fmt.Printf("Error loading default config file: %v\n", err)
+			log.Printf("Error loading default config file: %v\n", err)
 			os.Exit(1)
 		}
 		servicesRaw = file
@@ -48,11 +79,19 @@ func main() {
 	// Set myServices
 	err := json.Unmarshal(servicesRaw, &myServices)
 	if err != nil {
-		fmt.Printf("json.Unmarshal() error: %v\n", err)
+		log.Printf("json.Unmarshal() error: %v\n", err)
 		os.Exit(1)
 	}
-	// Handle Requests
-	http.HandleFunc("/", DefaultHandler(myServices))
-	http.ListenAndServe(":"+port, nil)
+	// Set Cassandra connection
+	mySession, err := cassandra.GetSession(myServices)
+	if err != nil {
+		log.Printf("Error loading default config file: %v\n", err)
+		os.Exit(1)
+	}
+	defer mySession.Close()
 
+	// Handle Requests
+	http.HandleFunc("/favicon.ico", handleFavicon)
+	http.HandleFunc("/", handleRequest(mySession))
+	http.ListenAndServe(":"+port, nil)
 }
