@@ -93,5 +93,8 @@ func main() {
 	// Handle Requests
 	http.HandleFunc("/favicon.ico", handleFavicon)
 	http.HandleFunc("/", handleRequest(mySession))
-	http.ListenAndServe(":"+port, nil)
+	err = http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Printf("ListenAndServe: ", err)
+	}
 }
