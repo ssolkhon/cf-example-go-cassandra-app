@@ -47,8 +47,16 @@ func handleRequest(session *gocql.Session) http.HandlerFunc {
 			msg := "Coming soon..."
 			fmt.Fprintf(w, msg)
 		case len(myPath) == 4:
-			msg := "Coming soon..."
-			fmt.Fprintf(w, msg)
+			err := cassandra.CreateRow(session, myPath[1], myPath[2], myPath[3])
+			if err != nil {
+				msg := "Error adding record: " + err.Error()
+				log.Println(msg)
+				fmt.Fprintf(w, msg)
+			} else {
+				msg := `Success, Added key/value: ` + myPath[2] + `/` + myPath[3]
+				log.Println(msg)
+				fmt.Fprintf(w, msg)
+			}
 		default:
 			msg := "Error: Too many parameters provided"
 			fmt.Fprintf(w, msg)
