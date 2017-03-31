@@ -44,8 +44,13 @@ func handleRequest(session *gocql.Session) http.HandlerFunc {
 				fmt.Fprintf(w, msg)
 			}
 		case len(myPath) == 3:
-			msg := "Coming soon..."
-			fmt.Fprintf(w, msg)
+			result, err := cassandra.GetRow(session, myPath[1], myPath[2])
+			if err != nil {
+				log.Println(err)
+				fmt.Fprintf(w, err.Error())
+			} else {
+				fmt.Fprintf(w, result)
+			}
 		case len(myPath) == 4:
 			err := cassandra.CreateRow(session, myPath[1], myPath[2], myPath[3])
 			if err != nil {
