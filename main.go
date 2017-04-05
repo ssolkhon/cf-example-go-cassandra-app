@@ -1,8 +1,8 @@
 package main
 
 import (
-	"cf-example-go-cassandra-app/cf"
-	"cf-example-go-cassandra-app/db/cassandra"
+	"cf-keystore/cf"
+	"cf-keystore/db/cassandra"
 	"encoding/json"
 	"fmt"
 	"github.com/gocql/gocql"

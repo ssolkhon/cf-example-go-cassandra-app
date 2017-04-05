@@ -1,7 +1,7 @@
 package cassandra
 
 import (
-	"cf-example-go-cassandra-app/cf"
+	"cf-keystore/cf"
 	"errors"
 	"github.com/gocql/gocql"
 	"strings"

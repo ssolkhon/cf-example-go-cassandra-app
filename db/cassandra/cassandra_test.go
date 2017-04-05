@@ -1,7 +1,7 @@
 package cassandra
 
 import (
-	"cf-example-go-cassandra-app/cf"
+	"cf-keystore/cf"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
