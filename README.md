@@ -2,7 +2,7 @@
 
 ### Create Service
 ```
-$ cf create-service cassandra default cf-example-cass
+$ cf create-service cassandra default cf-keystore
 ```
 
 ### Get Dependencies
