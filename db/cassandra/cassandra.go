@@ -2,6 +2,7 @@ package cassandra
 
 import (
 	"cf-example-go-cassandra-app/cf"
+	"errors"
 	"github.com/gocql/gocql"
 	"strings"
 )
@@ -13,7 +14,6 @@ func GetSession(c cf.CassandraService) (*gocql.Session, error) {
 	*/
 	myHosts := strings.Split(c.Credentials.Hosts, ",")
 	cluster := gocql.NewCluster(myHosts[0])
-	cluster.Keyspace = c.Credentials.Keyspace
 	cluster.Authenticator = gocql.PasswordAuthenticator{
 		Username: c.Credentials.Username,
 		Password: c.Credentials.Password,
@@ -23,12 +23,12 @@ func GetSession(c cf.CassandraService) (*gocql.Session, error) {
 	return cluster.CreateSession()
 }
 
-func CreateTable(session *gocql.Session, tableName string) error {
+func CreateTable(session *gocql.Session, keyspace string, table string) error {
 	/*
 	   Create table if it does not already exist
 	   Return err if any
 	*/
-	q := `CREATE TABLE IF NOT EXISTS "` + tableName + `" (
+	q := `CREATE TABLE IF NOT EXISTS "` + keyspace + `"."` + table + `" (
         id varchar PRIMARY KEY,
         value varchar
         )`
@@ -36,42 +36,48 @@ func CreateTable(session *gocql.Session, tableName string) error {
 	return session.Query(q).Exec()
 }
 
-func CreateRow(session *gocql.Session, table string, key string, value string) error {
+func CreateRow(session *gocql.Session, keyspace string, table string, key string, value string) error {
 	/*
 	   Create row in table or overwrite existing value
 	   Return err if any
 	*/
-	q := `INSERT INTO "` + table + `" (id, value)
+	q := `INSERT INTO "` + keyspace + `"."` + table + `" (id, value)
       VALUES ('` + key + `', '` + value + `')`
 
-	return session.Query(q).Exec()
+	if exists := tableExists(session, keyspace, table); exists == true {
+		return session.Query(q).Exec()
+	} else {
+		return errors.New(table + " does not exist - please create it.")
+	}
 }
 
-func GetRow(session *gocql.Session, table string, key string) (string, error) {
+func GetRow(session *gocql.Session, keyspace string, table string, key string) (string, error) {
 	/*
 	   Get row in table
 	   Return err if any
 	*/
 	var myValue string
 	q := `SELECT value
-      FROM "` + table + `"
+      FROM "` + keyspace + `"."` + table + `"
       WHERE id='` + key + `'`
 
-	err := session.Query(q).Scan(&myValue)
-
-	return myValue, err
+	if exists := tableExists(session, keyspace, table); exists == true {
+		err := session.Query(q).Scan(&myValue)
+		return myValue, err
+	} else {
+		err := errors.New(table + " does not exist - please create it.")
+		return myValue, err
+	}
 }
 
-func tableExists(session *gocql.Session, tableName string) bool {
+func tableExists(session *gocql.Session, keyspace string, table string) bool {
 	/*
 	   Check if table exists
 	   Return bool true if table exists
 	*/
-	myKeyspace := "local_example_cass_test" // TODO - FIX THIS
-
 	q := `SELECT columnfamily_name
     FROM system.schema_columnfamilies
-    WHERE keyspace_name='` + myKeyspace + `' AND columnfamily_name='` + tableName + `'`
+    WHERE keyspace_name='` + keyspace + `' AND columnfamily_name='` + table + `'`
 
 	if numRows := session.Query(q).Iter().NumRows(); numRows > 0 {
 		return true
