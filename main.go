@@ -22,14 +22,14 @@ func handleFavicon(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "favicon.ico")
 }
 
-func handleRequest(session *gocql.Session) http.HandlerFunc {
+func handleRequest(session *gocql.Session, keyspace string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		myPath := strings.Split(r.URL.Path, "/")
 
 		switch {
 		case len(myPath) == 2:
 			if myPath[1] != "" {
-				err := cassandra.CreateTable(session, myPath[1])
+				err := cassandra.CreateTable(session, keyspace, myPath[1])
 				if err != nil {
 					msg := "Error: " + err.Error()
 					fmt.Fprintf(w, msg)
@@ -44,23 +44,34 @@ func handleRequest(session *gocql.Session) http.HandlerFunc {
 				fmt.Fprintf(w, msg)
 			}
 		case len(myPath) == 3:
-			result, err := cassandra.GetRow(session, myPath[1], myPath[2])
+			result, err := cassandra.GetRow(session, keyspace, myPath[1], myPath[2])
 			if err != nil {
-				log.Println(err)
-				fmt.Fprintf(w, err.Error())
+				msg := "Error, " + myPath[2] + " " + err.Error()
+				log.Println(msg)
+				fmt.Fprintf(w, msg)
 			} else {
 				fmt.Fprintf(w, result)
 			}
 		case len(myPath) == 4:
-			err := cassandra.CreateRow(session, myPath[1], myPath[2], myPath[3])
-			if err != nil {
-				msg := "Error adding record: " + err.Error()
-				log.Println(msg)
-				fmt.Fprintf(w, msg)
+			if myPath[3] != "" {
+				err := cassandra.CreateRow(session, keyspace, myPath[1], myPath[2], myPath[3])
+				if err != nil {
+					log.Println(err.Error())
+					fmt.Fprintf(w, err.Error())
+				} else {
+					msg := `Success, Added key/value: ` + myPath[2] + `/` + myPath[3]
+					log.Println(msg)
+					fmt.Fprintf(w, msg)
+				}
 			} else {
-				msg := `Success, Added key/value: ` + myPath[2] + `/` + myPath[3]
-				log.Println(msg)
-				fmt.Fprintf(w, msg)
+				result, err := cassandra.GetRow(session, keyspace, myPath[1], myPath[2])
+				if err != nil {
+					msg := "Error, " + myPath[2] + " " + err.Error()
+					log.Println(msg)
+					fmt.Fprintf(w, msg)
+				} else {
+					fmt.Fprintf(w, result)
+				}
 			}
 		default:
 			msg := "Error: Too many parameters provided"
@@ -96,7 +107,7 @@ func main() {
 		os.Exit(1)
 	}
 	// Set Cassandra connection
-	mySession, err := cassandra.GetSession(myServices)
+	mySession, err := cassandra.GetSession(myServices.Cassandra[0])
 	if err != nil {
 		log.Printf("Error loading default config file: %v\n", err)
 		os.Exit(1)
@@ -105,7 +116,7 @@ func main() {
 
 	// Handle Requests
 	http.HandleFunc("/favicon.ico", handleFavicon)
-	http.HandleFunc("/", handleRequest(mySession))
+	http.HandleFunc("/", handleRequest(mySession, myServices.Cassandra[0].Credentials.Keyspace))
 	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Printf("ListenAndServe: ", err)
