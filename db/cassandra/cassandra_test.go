@@ -34,7 +34,7 @@ func TestGetSession(t *testing.T) {
 	}
 
 	t.Log("Getting session")
-	mySession, err := GetSession(myServices)
+	mySession, err := GetSession(myServices.Cassandra[0])
 	if err != nil {
 		t.Error("Error:", err)
 	}
@@ -48,7 +48,7 @@ func TestTableExists(t *testing.T) {
 		t.Error("Error:", err)
 	}
 	t.Log("Getting session")
-	mySession, err := GetSession(myServices)
+	mySession, err := GetSession(myServices.Cassandra[0])
 
 	myCases := make(map[string]bool, 2)
 	myCases["doesnotexist"] = false
@@ -69,7 +69,7 @@ func TestCreateTable(t *testing.T) {
 		t.Error("Error:", err)
 	}
 	t.Log("Getting session")
-	mySession, err := GetSession(myServices)
+	mySession, err := GetSession(myServices.Cassandra[0])
 
 	n := 10
 	b := make([]byte, n)
@@ -106,7 +106,7 @@ func TestCreateRow(t *testing.T) {
 		t.Error("Error:", err)
 	}
 	t.Log("Getting session")
-	mySession, err := GetSession(myServices)
+	mySession, err := GetSession(myServices.Cassandra[0])
 	t.Log("Adding", len(myCases), "test rows")
 	for k, v := range myCases {
 		err := CreateRow(mySession, myTableName, k, v)
@@ -134,7 +134,7 @@ func TestGetRow(t *testing.T) {
 		t.Error("Error:", err)
 	}
 	t.Log("Getting session")
-	mySession, err := GetSession(myServices)
+	mySession, err := GetSession(myServices.Cassandra[0])
 
 	t.Log("Finding", len(myCases), "test rows")
 	for k, v := range myCases {

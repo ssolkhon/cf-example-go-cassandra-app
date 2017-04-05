@@ -6,17 +6,17 @@ import (
 	"strings"
 )
 
-func GetSession(services *cf.Services) (*gocql.Session, error) {
+func GetSession(c cf.CassandraService) (*gocql.Session, error) {
 	/*
 	   Create gocql session for accessing Cassandra cluster
 	   Return gocql session
 	*/
-	myHosts := strings.Split(services.Cassandra[0].Credentials.Hosts, ",")
+	myHosts := strings.Split(c.Credentials.Hosts, ",")
 	cluster := gocql.NewCluster(myHosts[0])
-	cluster.Keyspace = services.Cassandra[0].Credentials.Keyspace
+	cluster.Keyspace = c.Credentials.Keyspace
 	cluster.Authenticator = gocql.PasswordAuthenticator{
-		Username: services.Cassandra[0].Credentials.Username,
-		Password: services.Cassandra[0].Credentials.Password,
+		Username: c.Credentials.Username,
+		Password: c.Credentials.Password,
 	}
 	cluster.Consistency = gocql.LocalOne
 

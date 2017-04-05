@@ -1,6 +1,6 @@
 package cf
 
-type CassandraService []struct {
+type CassandraService struct {
 	Name        string
 	Label       string
 	Tags        []string
@@ -16,5 +16,5 @@ type CassandraService []struct {
 }
 
 type Services struct {
-	Cassandra CassandraService
+	Cassandra []CassandraService
 }
