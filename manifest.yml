@@ -1,10 +1,10 @@
 ---
 applications:
-- name: go-cassandra
+- name: cf-keystore
   memory: 64M
   instances: 2
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
   env:
-    GOPACKAGENAME: cf-example-go-cassandra-app
+    GOPACKAGENAME: cf-keystore
   services:
-   - cf-example-cass
+   - cf-keystore
