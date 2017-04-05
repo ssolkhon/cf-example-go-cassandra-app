@@ -44,14 +44,28 @@ func handleRequest(session *gocql.Session, keyspace string) http.HandlerFunc {
 				fmt.Fprintf(w, msg)
 			}
 		case len(myPath) == 3:
-			result, err := cassandra.GetRow(session, keyspace, myPath[1], myPath[2])
-			if err != nil {
-				msg := "Error, " + myPath[2] + " " + err.Error()
-				log.Println(msg)
-				fmt.Fprintf(w, msg)
+			if myPath[2] != "" {
+				result, err := cassandra.GetRow(session, keyspace, myPath[1], myPath[2])
+				if err != nil {
+					msg := "Error, " + myPath[2] + " " + err.Error()
+					log.Println(msg)
+					fmt.Fprintf(w, msg)
+				} else {
+					fmt.Fprintf(w, result)
+				}
 			} else {
-				fmt.Fprintf(w, result)
+				err := cassandra.CreateTable(session, keyspace, myPath[1])
+				if err != nil {
+					msg := "Error: " + err.Error()
+					fmt.Fprintf(w, msg)
+					log.Println(msg)
+				} else {
+					msg := "Successfully created collection " + myPath[1]
+					fmt.Fprintf(w, msg)
+					log.Printf(msg)
+				}
 			}
+
 		case len(myPath) == 4:
 			if myPath[3] != "" {
 				err := cassandra.CreateRow(session, keyspace, myPath[1], myPath[2], myPath[3])
