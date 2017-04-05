@@ -24,6 +24,6 @@ $ cf push
 
 ### Run Tests
 ```
-$ cql -u <username> -p <password> -c db/cassandra/test_data/data.cql
-$ ginkgo -r
+$ cqlsh -u <username> -p <password> -f db/cassandra/test_data/data.cql
+$ go test -v ./...
 ```
