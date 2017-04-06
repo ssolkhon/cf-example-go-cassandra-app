@@ -5,6 +5,6 @@ applications:
   instances: 2
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
   env:
-    GOPACKAGENAME: cf-keystore
+    GOPACKAGENAME: github.com/ssolkhon/cf-keystore
   services:
    - cf-keystore

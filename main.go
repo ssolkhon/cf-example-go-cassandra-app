@@ -1,11 +1,11 @@
 package main
 
 import (
-	"cf-keystore/cf"
-	"cf-keystore/db/cassandra"
 	"encoding/json"
 	"fmt"
 	"github.com/gocql/gocql"
+	"github.com/ssolkhon/cf-keystore/cf"
+	"github.com/ssolkhon/cf-keystore/db/cassandra"
 	"io/ioutil"
 	"log"
 	"net/http"

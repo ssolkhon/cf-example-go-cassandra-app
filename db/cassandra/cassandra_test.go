@@ -1,10 +1,10 @@
 package cassandra
 
 import (
-	"cf-keystore/cf"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
+	"github.com/ssolkhon/cf-keystore/cf"
 	"io/ioutil"
 	"strings"
 	"testing"

@@ -1,9 +1,9 @@
 package cassandra
 
 import (
-	"cf-keystore/cf"
 	"errors"
 	"github.com/gocql/gocql"
+	"github.com/ssolkhon/cf-keystore/cf"
 	"strings"
 )
 
