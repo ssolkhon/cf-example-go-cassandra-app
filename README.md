@@ -1,5 +1,9 @@
 # READ ME
 
+```
+$ go get github.com/ssolkhon/cf-keystore
+```
+
 ### Create Service
 ```
 $ cf create-service cassandra default cf-keystore
