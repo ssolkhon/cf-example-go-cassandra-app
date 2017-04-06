@@ -10,6 +10,11 @@ $ cf create-service cassandra default cf-keystore
 $ cf push
 ```
 
+### Run Local
+```
+$ go run main.go
+```
+
 ### Run Tests
 ```
 $ cqlsh -u <username> -p <password> -f db/cassandra/test_data/data.cql
