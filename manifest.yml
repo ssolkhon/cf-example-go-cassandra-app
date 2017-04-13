@@ -3,7 +3,7 @@ applications:
 - name: cf-keystore
   memory: 64M
   instances: 2
-  buildpack: https://github.com/cloudfoundry/go-buildpack.git
+  buildpack: go_buildpack
   env:
     GOPACKAGENAME: github.com/ssolkhon/cf-keystore
   services:
