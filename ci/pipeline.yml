@@ -1,0 +1,27 @@
+resources:
+- name: cf-keystore
+  type: git
+  source:
+    uri: https://github.com/ssolkhon/cf-keystore.git
+    branch: master
+    skip_ssl_verification: true
+
+- name: deploy
+  type: cf
+  source:
+    api: {{cf_api_url}}
+    username: {{cf_user}}
+    password: {{cf_password}}
+    organization: {{cf_org}}
+    space: {{cf_space}}
+
+
+jobs:
+- name: build
+  plan:
+  - get: cf-keystore
+    trigger: true
+  - put: deploy
+    params:
+      manifest: cf-keystore/manifest.yml
+      path: cf-keystore
