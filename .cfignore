@@ -1,0 +1,7 @@
+.git
+.gitignore
+README.md
+ci/
+db/cassandra/test_data/
+example_config.json
+manifest.yml
